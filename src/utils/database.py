@@ -18,7 +18,7 @@ def update_object(
         db: Session,
         model: BaseModel,
         args: dict
-):
+) -> None:
     """
     Update one sqlalchemy object
 
