@@ -56,7 +56,7 @@ async def update_task(
         task_payload: TaskUpdateInput,
         db: Session = Depends(get_db)
 ):
-    task = Task.get_by_id(task_id)
+    task = Task.get_by_id(db, task_id)
 
     if not task:
         return JSONResponse(
@@ -92,7 +92,7 @@ async def delete_task(
     deleted, error = task.delete(db)
 
     if deleted:
-        return {"message": "Task updated"}
+        return {"message": "Task deleted"}
     else:
         return JSONResponse(
             status_code=500,

@@ -1,1 +1,3 @@
 DB_TODO_URL=postgresql://test:test@db:5432/todo
+
+TEST_DB_URL=postgresql://test:test@db:5432/test_todo
