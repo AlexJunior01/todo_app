@@ -123,15 +123,13 @@ class TestUpdateTask:
 
         response = web_client.patch('/task/1', json={'is_complete': True})
         body = response.json()
-        print(body)
-
         after_update_task = web_client.get('/task/1').json()
 
         assert response.status_code == 200
         assert body["message"] == "Task updated"
-        assert after_update_task
         assert before_update_task != after_update_task
         assert before_update_task["title"] == after_update_task["title"]
+        assert before_update_task["is_complete"] != after_update_task["is_complete"]
 
     def test_update_inexistent_task(
             self,
