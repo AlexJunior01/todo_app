@@ -1,7 +1,8 @@
 from typing import List, Tuple, Optional
 
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import relationship
 
 from src.database import BaseModel, Session
 from src.utils.database import update_object
@@ -19,6 +20,9 @@ class Task(BaseModel):
     description = Column(String, default="")
     priority = Column(Integer, nullable=False)
     is_complete = Column(Boolean, nullable=False, default=False)
+    project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
+
+    project = relationship('Project', back_populates='project')
 
     @classmethod
     def get_all(cls, db: Session) -> List["Task"]:
