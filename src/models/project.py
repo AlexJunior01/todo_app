@@ -9,9 +9,58 @@ from src.utils.database import update_object
 
 
 class Project(BaseModel):
+    __tablename__ = 'project'
+
     id = Column(Integer, primary_key=True)
     title = Column(String(50), nullable=False)
     description = Column(String, default="")
     finished = Column(Boolean, default=False)
 
-    tasks = relationship('Task', back_populates='tasks')
+    tasks = relationship('Task', back_populates='project')
+
+    @classmethod
+    def get_all(cls, db: Session) -> List["Project"]:
+        return db.query(cls).all()
+
+    @classmethod
+    def get_by_id(cls, db: Session, project_id: int) -> "Project":
+        return db.query(cls).filter_by(id=project_id).first()
+
+    def save(self, db: Session):
+        """
+        Save a project instance in the database
+        :param db: Database connection
+        :return: Tuple(was_saved, error_description)
+        """
+        try:
+            db.add(self)
+            db.commit()
+            return True, None
+        except SQLAlchemyError as error:
+            return False, ''.join(error.args)
+
+    def update(self, db: Session, update_args: dict):
+        """
+        Update a project instance
+        :param db: Database connection
+        :param update_args: Atributes to update
+        :return: Tuple(was_updated, error_description)
+        """
+        try:
+            update_object(db, self, update_args)
+            return True, None
+        except SQLAlchemyError as error:
+            return False, ''.join(error.args)
+
+    def delete(self, db: Session):
+        """
+        Delete a project instance
+        :param db: Database connection
+        :return:
+        """
+        try:
+            db.delete(self)
+            db.commit()
+            return True, None
+        except SQLAlchemyError as error:
+            return False, ''.join(error.args)

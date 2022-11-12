@@ -22,7 +22,7 @@ class Task(BaseModel):
     is_complete = Column(Boolean, nullable=False, default=False)
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
 
-    project = relationship('Project', back_populates='project')
+    project = relationship('Project', back_populates='tasks')
 
     @classmethod
     def get_all(cls, db: Session) -> List["Task"]:
