@@ -32,7 +32,7 @@ async def get_task(
         )
 
 
-@router.post('/', response_model=TaskOutput)
+@router.post('/', responses={500: {"model": ErrorMessage}}, response_model=TaskOutput)
 async def create_task(
         task: TaskInput,
         db: Session = Depends(get_db)

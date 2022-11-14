@@ -23,6 +23,7 @@ class TaskOutput(BaseModel):
     description: Optional[str]
     priority: int = Field(gt=0, lt=6)
     is_complete: Optional[bool] = Field(default=False)
+    project_id: Optional[int] = Field(default=None)
 
     class Config:
         orm_mode = True
