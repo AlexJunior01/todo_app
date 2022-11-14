@@ -9,7 +9,6 @@ from src.config import DB_TEST_URL, DB_CONNECTION_URL
 from src.database import get_db, BaseModel
 from src.utils.database import run_migration
 
-
 test_engine = create_engine(DB_TEST_URL)
 TestSession = sessionmaker(bind=test_engine)
 
@@ -54,4 +53,21 @@ def invalid_task():
         "description": "Buy beer and fruits",
         "priority": 1,
         "is_complete": False
+    }
+
+
+@pytest.fixture
+def valid_project():
+    return {
+        "title": "Test",
+        "description": "Test project",
+        "finished": False
+    }
+
+
+@pytest.fixture
+def invalid_project():
+    return {
+        "description": "Test project",
+        "finished": False
     }

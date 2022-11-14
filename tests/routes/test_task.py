@@ -9,10 +9,11 @@ class TestPostTask:
         response = web_client.post('/task/', json=valid_task)
         body = response.json()
         task_id = body.pop('id')
+        project_id = body.pop('project_id')
 
         assert response.status_code == 200
         assert body == valid_task
-        assert task_id is not None
+        assert task_id == 1
 
     def test_post_invalid_task(
             self,
