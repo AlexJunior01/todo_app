@@ -8,6 +8,7 @@ from src.models.project import Project
 from src.models.task import Task
 from src.schemas.common import ErrorMessage, Message
 from src.schemas.project import ProjectInput, ProjectOutput, ProjectUpdateInput
+from src.schemas.task import TaskOutput
 
 router = APIRouter()
 
@@ -197,7 +198,7 @@ async def delete_tasks_from_project(
 @router.get(
     '/{project_id}/task',
     responses={404: {"model": ErrorMessage}},
-    response_model=Message
+    response_model=List[TaskOutput]
 )
 async def get_all_tasks_linked_to_project(
         project_id: int,
