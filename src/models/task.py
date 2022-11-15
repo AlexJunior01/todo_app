@@ -43,6 +43,20 @@ class Task(BaseModel):
         """
         return db.query(cls).filter_by(id=task_id).first()
 
+    @classmethod
+    def get_by_ids(cls, db: Session, task_ids: List[int]) -> List["Task"]:
+        return db.query(cls).filter(cls.id.in_(task_ids)).all()
+
+    @classmethod
+    def get_non_existent_ids(cls, db: Session, task_ids: List[int]) -> List[int]:
+        ids_missing = []
+        for task_id in task_ids:
+            task = cls.get_by_id(db, task_id)
+            if not task:
+                ids_missing.append(task_id)
+
+        return ids_missing
+
     def save(self, db: Session) -> Tuple[bool, Optional[str]]:
         """
         Save a task instance in the database
