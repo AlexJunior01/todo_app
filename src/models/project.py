@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.exc import SQLAlchemyError
 
 from src.database import BaseModel, Session
+from src.models.task import Task
 from src.utils.database import update_object
 
 
@@ -25,6 +26,24 @@ class Project(BaseModel):
     @classmethod
     def get_by_id(cls, db: Session, project_id: int) -> "Project":
         return db.query(cls).filter_by(id=project_id).first()
+
+    def add_tasks(self, db: Session, tasks: List[Task]):
+        try:
+            for task in tasks:
+                self.tasks.append(task)
+            db.commit()
+            return True, None
+        except SQLAlchemyError as error:
+            return False, ''.join(error.args)
+
+    def remove_tasks(self, db: Session, tasks: List[Task]):
+        try:
+            for task in tasks:
+                self.tasks.remove(task)
+            db.commit()
+            return True, None
+        except SQLAlchemyError as error:
+            return False, ''.join(error.args)
 
     def save(self, db: Session):
         """

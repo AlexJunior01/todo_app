@@ -1,6 +1,8 @@
-from typing import Optional
+from typing import Optional, List
 
 from pydantic import BaseModel, Field
+
+from src.schemas.task import TaskOutput
 
 
 class ProjectInput(BaseModel):
@@ -20,6 +22,7 @@ class ProjectOutput(BaseModel):
     title: str
     description: Optional[str]
     finished: Optional[bool] = Field(default=False)
+    tasks: Optional[List[TaskOutput]] = Field(default=[])
 
     class Config:
         orm_mode = True
