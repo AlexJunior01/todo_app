@@ -14,6 +14,19 @@ The project was developed using Python 3.9, PostgreSQL and use these libs and to
 - **Pydantic** and **sqlachemy** to handle the API data validation and  use ORM model to comunicate with database;
 - **Pytest** and **coverage** to tests.
 
+## Features
+### Project and Tasks
+- [x] Complete CRUD for tasks
+- [x] Complete CRUD for projects
+- [x] Routes to manage link between project and tasks
+- [ ] Filters in GET task endpoints
+
+### System configuration
+- [x] Running in Docker
+- [x] Migration system configured
+- [x] Automated tests running on an isolated test database
+- [ ] User authorization and authentication
+
 ## How to run
 
 ### Prerequisites
