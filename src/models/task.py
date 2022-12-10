@@ -5,10 +5,11 @@ from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from src.database import BaseModel, Session
+from src.models.base_sql_model import BaseSQLModel
 from src.utils.database import update_object
 
 
-class Task(BaseModel):
+class Task(BaseModel, BaseSQLModel):
     """
     Mapping class for table task
     """
@@ -56,42 +57,3 @@ class Task(BaseModel):
                 ids_missing.append(task_id)
 
         return ids_missing
-
-    def save(self, db: Session) -> Tuple[bool, Optional[str]]:
-        """
-        Save a task instance in the database
-        :param db: Database connection
-        :return: Tuple(was_saved, error_description)
-        """
-        try:
-            db.add(self)
-            db.commit()
-            return True, None
-        except SQLAlchemyError as error:
-            return False, ''.join(error.args)
-
-    def update(self, db: Session, update_args: dict):
-        """
-        Update a task instance
-        :param db: Database connection
-        :param update_args: Atributes to update
-        :return: Tuple(was_saved, error_description)
-        """
-        try:
-            update_object(db, self, update_args)
-            return True, None
-        except SQLAlchemyError as error:
-            return False, ''.join(error.args)
-
-    def delete(self, db: Session):
-        """
-        Delete a task instance from the database
-        :param db: Database connection
-        :return:
-        """
-        try:
-            db.delete(self)
-            db.commit()
-            return True, None
-        except SQLAlchemyError as error:
-            return False, ''.join(error.args)
