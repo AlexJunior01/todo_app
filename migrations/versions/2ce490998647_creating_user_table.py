@@ -20,6 +20,7 @@ def upgrade() -> None:
         'users',
         sa.Column('id', sa.Integer(), primary_key=True),
         sa.Column('username', sa.String(), nullable=False, unique=True),
+        sa.Column('email', sa.String(), nullable=False, unique=True),
         sa.Column('first_name', sa.String(), nullable=False),
         sa.Column('last_name', sa.String(), nullable=False),
         sa.Column('hashed_password', sa.String(), nullable=False),
@@ -31,4 +32,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    pass
+    op.drop_table('users')
