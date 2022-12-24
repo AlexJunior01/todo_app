@@ -1,6 +1,6 @@
 from typing import List, Tuple, Optional
 
-from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -17,8 +17,10 @@ class Project(BaseModel, BaseSQLModel):
     title = Column(String(50), nullable=False)
     description = Column(String, default="")
     finished = Column(Boolean, default=False)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     tasks = relationship('Task', back_populates='project')
+    user = relationship('Users', back_populates='projects')
 
     @classmethod
     def get_all(cls, db: Session) -> List["Project"]:

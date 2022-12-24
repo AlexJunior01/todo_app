@@ -22,8 +22,10 @@ class Task(BaseModel, BaseSQLModel):
     priority = Column(Integer, nullable=False)
     is_complete = Column(Boolean, nullable=False, default=False)
     project_id = Column(Integer, ForeignKey('project.id'), nullable=True)
+    user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     project = relationship('Project', back_populates='tasks')
+    user = relationship('Users', back_populates='tasks')
 
     @classmethod
     def get_all(cls, db: Session) -> List["Task"]:

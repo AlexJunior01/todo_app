@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, Boolean
+from sqlalchemy.orm import relationship
 
 from src.database import BaseModel
 from src.models.base_sql_model import BaseSQLModel
@@ -14,3 +15,6 @@ class Users(BaseModel, BaseSQLModel):
     username = Column(String)
     hashed_password = Column(String)
     active = Column(Boolean, default=True)
+
+    tasks = relationship('Task', backpopulates='user')
+    projects = relationship('Project', backpopulates='user')
