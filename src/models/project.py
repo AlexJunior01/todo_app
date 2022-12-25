@@ -1,4 +1,4 @@
-from typing import List, Tuple, Optional
+from typing import List
 
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
@@ -7,7 +7,6 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.database import BaseModel, Session
 from src.models.base_sql_model import BaseSQLModel
 from src.models.task import Task
-from src.utils.database import update_object
 
 
 class Project(BaseModel, BaseSQLModel):
@@ -20,7 +19,7 @@ class Project(BaseModel, BaseSQLModel):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     tasks = relationship('Task', back_populates='project')
-    user = relationship('Users', back_populates='projects')
+    user = relationship('User', back_populates='projects')
 
     @classmethod
     def get_all(cls, db: Session) -> List["Project"]:

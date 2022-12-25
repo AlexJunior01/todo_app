@@ -1,12 +1,10 @@
-from typing import List, Tuple, Optional
+from typing import List
 
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import relationship
 
 from src.database import BaseModel, Session
 from src.models.base_sql_model import BaseSQLModel
-from src.utils.database import update_object
 
 
 class Task(BaseModel, BaseSQLModel):
@@ -25,7 +23,7 @@ class Task(BaseModel, BaseSQLModel):
     user_id = Column(Integer, ForeignKey('users.id'), nullable=False)
 
     project = relationship('Project', back_populates='tasks')
-    user = relationship('Users', back_populates='tasks')
+    user = relationship('User', back_populates='tasks')
 
     @classmethod
     def get_all(cls, db: Session) -> List["Task"]:
@@ -52,6 +50,7 @@ class Task(BaseModel, BaseSQLModel):
 
     @classmethod
     def get_non_existent_ids(cls, db: Session, task_ids: List[int]) -> List[int]:
+        # TODO: try to change the implementation for some using set()
         ids_missing = []
         for task_id in task_ids:
             task = cls.get_by_id(db, task_id)
