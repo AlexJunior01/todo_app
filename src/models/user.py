@@ -22,3 +22,7 @@ class User(BaseModel, BaseSQLModel):
     @classmethod
     def get_by_username(cls, db: Session, username: str) -> "User":
         return db.query(cls).filter_by(username=username).first()
+
+    @classmethod
+    def get_by_id(cls, db: Session, user_id: int) -> "User":
+        return db.query(cls).filter_by(id=user_id).first()
