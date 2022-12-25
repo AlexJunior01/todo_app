@@ -3,8 +3,10 @@ from typing import List
 from fastapi import APIRouter, Depends
 from starlette.responses import JSONResponse
 
+from src.auth import get_current_user
 from src.database import get_db, Session
 from src.models.task import Task
+from src.models.user import User
 from src.schemas.common import ErrorMessage, Message
 from src.schemas.task import TaskInput, TaskOutput, TaskUpdateInput
 
@@ -13,16 +15,20 @@ router = APIRouter()
 
 
 @router.get('/', response_model=List[TaskOutput])
-async def get_all_tasks(db: Session = Depends(get_db)):
-    return Task.get_all(db)
+async def get_all_tasks(
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
+):
+    return Task.get_all(db, user.id)
 
 
 @router.get('/{task_id}', responses={404: {"model": ErrorMessage}}, response_model=TaskOutput)
 async def get_task(
         task_id: int,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    task = Task.get_by_id(db, task_id)
+    task = Task.get_by_id(db, task_id, user.id)
     if task:
         return task
     else:
@@ -35,9 +41,12 @@ async def get_task(
 @router.post('/', responses={500: {"model": ErrorMessage}}, response_model=TaskOutput)
 async def create_task(
         task: TaskInput,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
     task_model = Task(**task.dict())
+    task_model.user_id = user.id
+
     saved, error = task_model.save(db)
 
     if saved:
@@ -54,9 +63,10 @@ async def create_task(
 async def update_task(
         task_id: int,
         task_payload: TaskUpdateInput,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    task = Task.get_by_id(db, task_id)
+    task = Task.get_by_id(db, task_id, user.id)
 
     if not task:
         return JSONResponse(
@@ -79,9 +89,10 @@ async def update_task(
 @router.delete('/{task_id}', responses={404: {"model": ErrorMessage}}, response_model=Message)
 async def delete_task(
         task_id: int,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    task = Task.get_by_id(db, task_id)
+    task = Task.get_by_id(db, task_id, user.id)
 
     if not task:
         return JSONResponse(

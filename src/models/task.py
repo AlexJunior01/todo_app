@@ -26,23 +26,23 @@ class Task(BaseModel, BaseSQLModel):
     user = relationship('User', back_populates='tasks')
 
     @classmethod
-    def get_all(cls, db: Session) -> List["Task"]:
+    def get_all(cls, db: Session, user_id: int) -> List["Task"]:
         """
         Retrieve all items from database
         :param db: Database connection
         :return: List of Tasks Objects
         """
-        return db.query(cls).all()
+        return db.query(cls).filter_by(user_id=user_id).all()
 
     @classmethod
-    def get_by_id(cls, db: Session, task_id: int) -> "Task":
+    def get_by_id(cls, db: Session, task_id: int, user_id: int) -> "Task":
         """
         Retrieve one task by id from database
         :param db: Database connection
         :param task_id: Task id used to search
         :return: Task Object
         """
-        return db.query(cls).filter_by(id=task_id).first()
+        return db.query(cls).filter_by(id=task_id, user_id=user_id).first()
 
     @classmethod
     def get_by_ids(cls, db: Session, task_ids: List[int]) -> List["Task"]:
