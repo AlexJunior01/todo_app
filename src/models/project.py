@@ -22,12 +22,12 @@ class Project(BaseModel, BaseSQLModel):
     user = relationship('User', back_populates='projects')
 
     @classmethod
-    def get_all(cls, db: Session) -> List["Project"]:
-        return db.query(cls).all()
+    def get_all(cls, db: Session, user_id: int) -> List["Project"]:
+        return db.query(cls).filter_by(user_id=user_id).all()
 
     @classmethod
-    def get_by_id(cls, db: Session, project_id: int) -> "Project":
-        return db.query(cls).filter_by(id=project_id).first()
+    def get_by_id(cls, db: Session, project_id: int, user_id: int) -> "Project":
+        return db.query(cls).filter_by(id=project_id, user_id=user_id).first()
 
     def add_tasks(self, db: Session, tasks: List[Task]):
         try:

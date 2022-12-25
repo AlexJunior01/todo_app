@@ -3,9 +3,11 @@ from typing import List, Optional
 from fastapi import APIRouter, Depends
 from starlette.responses import JSONResponse
 
+from src.auth import get_current_user
 from src.database import get_db, Session
 from src.models.project import Project
 from src.models.task import Task
+from src.models.user import User
 from src.schemas.common import ErrorMessage, Message
 from src.schemas.project import ProjectInput, ProjectOutput, ProjectUpdateInput
 from src.schemas.task import TaskOutput
@@ -14,16 +16,20 @@ router = APIRouter()
 
 
 @router.get('/', response_model=List[ProjectOutput])
-async def get_all_projects(db: Session = Depends(get_db)):
-    return Project.get_all(db)
+async def get_all_projects(
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
+):
+    return Project.get_all(db, user.id)
 
 
 @router.get('/{project_id}', responses={404: {"model": Message}}, response_model=ProjectOutput)
 async def get_project(
         project_id: int,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    project = Project().get_by_id(db, project_id)
+    project = Project().get_by_id(db, project_id, user.id)
 
     if not project:
         return JSONResponse(
@@ -37,9 +43,11 @@ async def get_project(
 @router.post('/', responses={500: {"model": ErrorMessage}}, response_model=ProjectOutput)
 async def create_project(
         project_input: ProjectInput,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
     project_model = Project(**project_input.dict())
+    project_model.user_id = user.id
     saved, error = project_model.save(db)
 
     if saved:
@@ -59,9 +67,10 @@ async def create_project(
 async def update_project(
         project_id: int,
         project_payload: ProjectUpdateInput,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    project_model = Project.get_by_id(db, project_id)
+    project_model = Project.get_by_id(db, project_id, user.id)
 
     if not project_model:
         return JSONResponse(
@@ -89,9 +98,10 @@ async def update_project(
 async def delete_project(
         project_id: int,
         delete_tasks: Optional[bool] = False,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    project_model = Project.get_by_id(db, project_id)
+    project_model = Project.get_by_id(db, project_id, user.id)
 
     if not project_model:
         return JSONResponse(
@@ -123,9 +133,10 @@ async def delete_project(
 async def add_task_to_project(
         project_id: int,
         task_ids: List[int],
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    project_model = Project.get_by_id(db, project_id)
+    project_model = Project.get_by_id(db, project_id, user.id)
 
     if not project_model:
         return JSONResponse(
@@ -133,7 +144,7 @@ async def add_task_to_project(
             content={"message": "Project not found."}
         )
 
-    non_existen_ids = Task.get_non_existent_ids(db, task_ids)
+    non_existen_ids = Task.get_non_existent_ids(db, task_ids, user.id)
 
     if non_existen_ids:
         return JSONResponse(
@@ -141,7 +152,7 @@ async def add_task_to_project(
             content={"message": f"Task_ids {non_existen_ids} do not exist."}
         )
 
-    tasks = Task.get_by_ids(db, task_ids)
+    tasks = Task.get_by_ids(db, task_ids, user.id)
 
     added, error = project_model.add_tasks(db, tasks)
 
@@ -163,9 +174,10 @@ async def add_task_to_project(
 async def delete_tasks_from_project(
         project_id: int,
         task_ids: List[int],
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    project_model = Project.get_by_id(db, project_id)
+    project_model = Project.get_by_id(db, project_id, user.id)
 
     if not project_model:
         return JSONResponse(
@@ -173,7 +185,7 @@ async def delete_tasks_from_project(
             content={"message": "Project not found."}
         )
 
-    non_existen_ids = Task.get_non_existent_ids(db, task_ids)
+    non_existen_ids = Task.get_non_existent_ids(db, task_ids, user.id)
 
     if non_existen_ids:
         return JSONResponse(
@@ -181,7 +193,7 @@ async def delete_tasks_from_project(
             content={"message": f"Task_ids {non_existen_ids} do not exist."}
         )
 
-    tasks = Task.get_by_ids(db, task_ids)
+    tasks = Task.get_by_ids(db, task_ids, user.id)
 
     removed, error = project_model.remove_tasks(db, tasks)
 
@@ -202,9 +214,10 @@ async def delete_tasks_from_project(
 )
 async def get_all_tasks_linked_to_project(
         project_id: int,
-        db: Session = Depends(get_db)
+        db: Session = Depends(get_db),
+        user: User = Depends(get_current_user)
 ):
-    project_model = Project.get_by_id(db, project_id)
+    project_model = Project.get_by_id(db, project_id, user.id)
 
     if not project_model:
         return JSONResponse(

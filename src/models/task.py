@@ -45,15 +45,15 @@ class Task(BaseModel, BaseSQLModel):
         return db.query(cls).filter_by(id=task_id, user_id=user_id).first()
 
     @classmethod
-    def get_by_ids(cls, db: Session, task_ids: List[int]) -> List["Task"]:
-        return db.query(cls).filter(cls.id.in_(task_ids)).all()
+    def get_by_ids(cls, db: Session, task_ids: List[int], user_id: int) -> List["Task"]:
+        return db.query(cls).filter(cls.id.in_(task_ids)).filter_by(user_id=user_id).all()
 
     @classmethod
-    def get_non_existent_ids(cls, db: Session, task_ids: List[int]) -> List[int]:
+    def get_non_existent_ids(cls, db: Session, task_ids: List[int], user_id: int) -> List[int]:
         # TODO: try to change the implementation for some using set()
         ids_missing = []
         for task_id in task_ids:
-            task = cls.get_by_id(db, task_id)
+            task = cls.get_by_id(db, task_id, user_id)
             if not task:
                 ids_missing.append(task_id)
 
